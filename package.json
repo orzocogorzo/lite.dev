@@ -1,0 +1,14 @@
+{
+  "name": "devlite",
+  "version": "1.0.0",
+  "description": "My devlite boilerplate",
+  "main": "index.js",
+  "repository": "https://github.com/orzocogorzo/devlite",
+  "author": "Orzo Cogorzo",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "default": "cd .devlite && gulp serve",
+    "serve": "cd .devlite && gulp serve"
+  }
+}

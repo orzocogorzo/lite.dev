@@ -1,0 +1,9 @@
+# npm environment
+node_modules
+yarn-error.log
+
+# folders
+.dist/*
+src/assets/data/*
+src/assets/images/*
+src/assets/fonts/*
