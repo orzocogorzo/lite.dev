@@ -9,6 +9,11 @@
   "private": false,
   "scripts": {
     "default": "cd .devlite && gulp serve",
-    "serve": "cd .devlite && gulp serve"
+    "serve": "cd .devlite && gulp serve",
+    "build": "cd .devlite && gulp build"
+  },
+  "dependencies": {
+    "mapbox-gl": "^1.4.1",
+    "snabbdom": "^0.7.3"
   }
 }

@@ -1847,7 +1847,7 @@ concat-stream@1.5.x:
     readable-stream "~2.0.0"
     typedarray "~0.0.5"
 
-concat-stream@^1.6.0, concat-stream@^1.6.1, concat-stream@~1.6.0:
+concat-stream@^1.6.0, concat-stream@^1.6.1, concat-stream@~1.6.0, concat-stream@~1.6.x:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.6.2.tgz#904bdf194cd3122fc675c77fc4ac3d4ff0fd1a34"
   integrity sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==
@@ -2658,7 +2658,7 @@ event-emitter@^0.3.5:
     d "1"
     es5-ext "~0.10.14"
 
-event-stream@^3.0.20:
+event-stream@^3.0.20, event-stream@~3.3.4:
   version "3.3.5"
   resolved "https://registry.yarnpkg.com/event-stream/-/event-stream-3.3.5.tgz#e5dd8989543630d94c6cf4d657120341fa31636b"
   integrity sha512-vyibDcu5JL20Me1fP734QBH/kenBGLZap2n0+XXM7mvuUPzJ20Ydqj1aKcIeMdri1p+PU+4yAKugjN8KCVst+g==
@@ -3588,6 +3588,15 @@ gulp-stylus@^2.7.0:
     stylus "^0.54.0"
     through2 "^2.0.0"
     vinyl-sourcemaps-apply "^0.2.0"
+
+gulp-token-replace@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/gulp-token-replace/-/gulp-token-replace-1.1.5.tgz#2e31ff3a3cbd88aa45c2060568859e5fe20397e5"
+  integrity sha512-DHvSlNU+B7+gr4KbGeVH7806Di+QG0//st1HGCtRFbyQHXuXKWTWhkG/QC89EQNLNvpp6vx4wTT8ZhAimoUIJg==
+  dependencies:
+    concat-stream "~1.6.x"
+    event-stream "~3.3.4"
+    plugin-error "~1.0.x"
 
 gulp-uglify@^3.0.2:
   version "3.0.2"
@@ -5790,7 +5799,7 @@ pinkie@^2.0.0:
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
-plugin-error@1.0.1, plugin-error@^1.0.1:
+plugin-error@1.0.1, plugin-error@^1.0.1, plugin-error@~1.0.x:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/plugin-error/-/plugin-error-1.0.1.tgz#77016bd8919d0ac377fdcdd0322328953ca5781c"
   integrity sha512-L1zP0dk7vGweZME2i+EeakvUNqSrdiI3F91TwEoYiGrAfUXmVv6fJIq4g82PAXxNsWOp0J7ZqQy/3Szz0ajTxA==

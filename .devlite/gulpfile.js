@@ -1,8 +1,11 @@
+// SYS
+const path = require("path");
+
 // VENDOR
 const { src, dest, parallel, series, watch } = require('gulp');
 const del = require('del');
 const browserify = require('browserify');
-const http = require("http");
+// const http = require("http");
 
 // GULP PLUGINS
 const htmlmin = require('gulp-html-minifier');
@@ -10,58 +13,108 @@ const babel = require('gulp-babel');
 const stylus = require('gulp-stylus');
 const image = require('gulp-image');
 const vinylSource = require('vinyl-source-stream');
-// const gulpBuffer = require('gulp-buffer');
 const vinylBuffer = require('vinyl-buffer');
 const sourcemaps = require('gulp-sourcemaps');
 const uglify = require('gulp-uglify');
-// const concat = require('gulp-concat');
+const replace = require('gulp-token-replace');
 const connect = require('gulp-connect');
 const rename = require('gulp-rename');
 
+const join = path.join;
+const rc = (function () {
+  const template = {
+    build: "../server/statics",
+    dist: ".dist",
+    src: "src",
+    js: "scripts/index.js",
+    html: "index.html",
+    css: "styles/index.styl",
+    images: "assets/images",
+    data: "assets/data"
+  }
+  try {
+    const rc = require("../devliterc.js");
+    const user = Object.keys(rc).reduce((a, k) => {
+      a[k] = k === "dist" || k === "src" || k === "build" ? join("..", rc[k]) : rc[k];
+      return a;
+    }, new Object());
+    Object.keys(rc).map((k) => {
+      user[k] = user[k] || template[k];
+    });
+    console.log(user);
+    return user;
+  } catch (e) {
+    console.error(e);
+    console.warn("Not devlite.rc file found");
+    return template;
+  }
+})();
+
+function getEnv () {
+  const envPath = process.env.NODE_ENV === "production" ?
+    "./build/build.pro.js" : process.env.NODE_ENV === "preproduction" ?
+    "./build/build.pre.js" : "./build/build.dev.js";
+  return require(envPath);
+}
 
 function clean (done) {
   return del([
-    "../.dist/*"
+    join(rc.dist + "\*")
   ], {
     force: true
   });
 }
-clean.description = "Remove .dist folder contents";
-exports.clean = clean;
+clean.description = "Remove dist folder contents";
+// exports.clean = clean;
 
 
 function dist (done) {
+  const assets = join(rc.dist, "assets");
   return src("*.*", {read: false})
-    .pipe(dest("../.dist/assets"))
-    .pipe(dest("../.dist/assets/images"))
-    .pipe(dest("../.dist/assets/data"))
+    .pipe(dest(join(assets)))
+    .pipe(dest(join(assets, "images")))
+    .pipe(dest(join(assets, "data")));
 };
 dist.description = "Create dist directory structure";
-exports.dist = dist;
+// exports.dist = dist;
 
+function deploy (done) {
+  console.log("[DEPLOY TASK]");
+  console.log("FROM: ", rc.dist);
+  console.log("TO: ", rc.build);
+  return src(join(rc.dist, "\*"))
+    .pipe(dest(join(rc.build)));
+}
+deploy.description = 'Deploy bundling to the server';
+// exports.deploy;
 
 function js (done) {
   const b = browserify({
-      entries: "../src/index.js",
+      entries: join(rc.src, rc.js),
       debug: true
   });
 
-  return b.bundle()
+  var proc = b.bundle()
     .pipe(vinylSource('bundle.js'))
-    .pipe(vinylBuffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(vinylBuffer());
+
+  if (process.env.NODE_ENV === 'production') {
+    proc = proc.pipe(sourcemaps.init({loadMaps: true}))
       .pipe(babel({presets: ['@babel/preset-env']}))
       .pipe(uglify())
       .on('error', console.error)
-    .pipe(sourcemaps.write())
-    .pipe(connect.reload())
-    .pipe(dest('../.dist'));
+    .pipe(sourcemaps.write());
+  } else {
+    proc = proc.pipe(connect.reload());
+  }
+
+  return proc.pipe(dest(rc.dist));
 }
 js.description = 'Bundle js files, compile them with buble and uglify and move the output to the .dist folder';
-exports.js = js;
+// exports.js = js;
 
 function css (done) {
-  return src('../src/styles/index.styl')
+  return src(join(rc.src, rc.css))
     .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(stylus({
         compress: true
@@ -69,56 +122,52 @@ function css (done) {
     .pipe(sourcemaps.write())
     .pipe(rename('bundle.css'))
     .pipe(connect.reload())
-    .pipe(dest('../.dist'));
+    .pipe(dest(rc.dist));
 }
-css.descriptions = "Budnle all styuls files, compile them and move the output to the .dist folder";
-exports.css = css;
+css.descriptions = "Bundle all styuls files, compile them and move the output to the .dist folder";
+// exports.css = css;
 
 
 function imageCompress (done) {
-  return src("../src/assets/images/*")
+  return src(join(rc.src, rc.images, "\*"))
     .pipe(image())
     .pipe(connect.reload())
-    .pipe(dest("../.dist/assets/images"));
+    .pipe(dest(join(rc.dist, "assets/images")));
 }
 imageCompress.description = "Compress images and move them to the .dist/assets/images folder";
-exports.image = imageCompress;
+// exports.image = imageCompress;
 
 function data (done) {
-  return src("../src/assets/data/*")
+  return src(join(rc.src, rc.data, "\*"))
     .pipe(connect.reload())
     .pipe(dest("../.dist/assets/data"));
 };
 data.description = "Move data to .dist folder";
-exports.data = data;
+// exports.data = data;
 
 
 function html (done) {
-  return src("../src/index.html")
+  const env = getEnv();
+  return src(join(rc.src, rc.html))
+    .pipe(replace({global: env}))
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(connect.reload())
-    .pipe(dest("../.dist"));
+    .pipe(dest(rc.dist));
 }
 html.description = "Minify index.html and put it on the .dist folder";
-exports.html = html;
-
-// function reload (done) {
-//   done();
-//   connect.reload();
-// }
-
+// exports.html = html;
 
 const bundle = parallel(html, js, css, imageCompress, data);
 exports.bundle = bundle;
 const pipeline = series(clean, dist, bundle);
-exports.pipeline = pipeline;
+// exports.pipeline = pipeline;
 
 
 const serve = series(pipeline, function serve (done) {
   connect.server({
     livereload: true,
     port: 8050,
-    root: '../.dist',
+    root: rc.dist,
     debug: true,
     name: 'lite-dev',
     middleware: function (connect, opt) {
@@ -131,14 +180,21 @@ const serve = series(pipeline, function serve (done) {
     }
   });
 
-  watch("../src/index.html", series(html));
-  watch("../src/**/*.js", series(js));
-  watch("../src/**/*.styl", series(css));
-  watch("../src/assets/images/*", series(imageCompress));
-  watch("../src/assets/data/*", series(data));
+  watch(join(rc.src, rc.html), series(html));
+  watch(join(rc.src, "\*\*/\*.js"), series(js));
+  watch(join(rc.src, "\*\*/\*.styl"), series(css));
+  watch(join(rc.src, rc.images, "\*"), series(imageCompress));
+  watch(join(rc.src, rc.data, "\*"), series(data));
 });
 serve.description = "Setup a static server, start a livereload listener and put gulp watching for changes";
 exports.serve = serve;
+
+const build = series(function (done) {
+    process.env.NODE_ENV = "production";
+    return done();
+}, pipeline, deploy);
+build.description = "execute build rutine and deploy the result on the server";
+exports.build = build;
 
 
 function defaultTask () {
