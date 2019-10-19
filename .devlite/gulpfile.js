@@ -1,5 +1,6 @@
 // SYS
 const path = require("path");
+const fs = require("fs");
 
 // VENDOR
 const { src, dest, parallel, series, watch } = require('gulp');
@@ -41,7 +42,6 @@ const rc = (function () {
     Object.keys(rc).map((k) => {
       user[k] = user[k] || template[k];
     });
-    console.log(user);
     return user;
   } catch (e) {
     console.error(e);
@@ -53,8 +53,10 @@ const rc = (function () {
 function getEnv () {
   const envPath = process.env.NODE_ENV === "production" ?
     "./build/build.pro.js" : process.env.NODE_ENV === "preproduction" ?
-    "./build/build.pre.js" : "./build/build.dev.js";
-  return require(envPath);
+    "./build/build.pre.js" : process.env.NODE_ENV === "local" ? 
+    "./build/build.local.js" : "./build/build.dev.js";
+  console.log(envPath, process.env.NODE_ENV);
+    return require(envPath);
 }
 
 function clean (done) {
@@ -79,14 +81,21 @@ dist.description = "Create dist directory structure";
 // exports.dist = dist;
 
 function deploy (done) {
-  console.log("[DEPLOY TASK]");
-  console.log("FROM: ", rc.dist);
-  console.log("TO: ", rc.build);
   return src(join(rc.dist, "\*"))
     .pipe(dest(join(rc.build)));
 }
 deploy.description = 'Deploy bundling to the server';
 // exports.deploy;
+
+
+function environ (done) {
+  const environ = require("../envs.js")[process.env.NODE_ENV === "production" ? "pro" : "dev"];
+  fs.writeFile(join(rc.dist, "env.js"), "var environment = " + JSON.stringify(environ), function (err) {
+    if (err) console.error(err);
+    done();
+  });
+}
+environ.description = "Declare environment configuration for the compiled code";
 
 function js (done) {
   const b = browserify({
@@ -157,7 +166,7 @@ function html (done) {
 html.description = "Minify index.html and put it on the .dist folder";
 // exports.html = html;
 
-const bundle = parallel(html, js, css, imageCompress, data);
+const bundle = parallel(environ, html, js, css, imageCompress, data);
 exports.bundle = bundle;
 const pipeline = series(clean, dist, bundle);
 // exports.pipeline = pipeline;
@@ -190,12 +199,18 @@ serve.description = "Setup a static server, start a livereload listener and put 
 exports.serve = serve;
 
 const build = series(function (done) {
-    process.env.NODE_ENV = "production";
-    return done();
+  process.env.NODE_ENV = "production";  
+  return done();
 }, pipeline, deploy);
-build.description = "execute build rutine and deploy the result on the server";
+build.description = "Execute build for production rutine and deploy the result on the server";
 exports.build = build;
 
+const local = series(function (done) {
+  process.env.NODE_ENV = "local";
+  return done();
+}, pipeline, deploy);
+local.description = "Execute build for local routine and deploy the results on the server";
+exports.local = local;
 
 function defaultTask () {
   serve();

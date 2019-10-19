@@ -1,8 +1,7 @@
 // VENDOR
 
 // MODULES
-const startApp = require('./index.js');
-window.environment = require('../environment.js')[process.env.NODE_ENV === "production" ? "pro" : "dev"];
+const startApp = require('./app.js');
 
 if (document.addEventListener) {
     document.addEventListener("DOMContentLoaded", startApp, false);

@@ -10,6 +10,7 @@
   "scripts": {
     "default": "cd .devlite && gulp serve",
     "serve": "cd .devlite && gulp serve",
+    "local": "cd .devlite && gulp local",
     "build": "cd .devlite && gulp build"
   },
   "dependencies": {
