@@ -51,26 +51,25 @@ const rc = (function () {
 })();
 
 function getEnv () {
-  let environments = new Map([
+  let envs = new Map([
     ["pro", "./build/build.pro.js"],
     ["pre", "./build/build.pre.js"],
     ["dev", "./build/build.dev.js"]
   ]);
 
   fs.readdir(path.join(__dirname, "../build"), function (err, files) {
-    if (err) {
-      console.log("Can't find build directory defined by the user.");
-    } else {
-      if (files.length == 0) console.log("Can't find build environments defined by the user.");
+    if (err) {console.log("Can't find build directory defined by the user.");}
+    else {
+      if (files.length == 0) {console.log("Can't find build environments defined by the user.");}
       let env;
-      files.filter(file => file.match(/^build\./).map(file => {
+      files.filter(file => file.match(/^build\./)).forEach(file => {
         env = file.match(/^build\.([^\.]*)\.js$/);
-        environments.set(env, path.join(__dirname, "../build", file);
+        envs.set(env, path.join(__dirname, "../build", file));
       });
     }
   });
 
-  return require(envs.get(process.env.NODE_ENV) || envs);
+  return require(envs.get(process.env.NODE_ENV) || envs.get("dev"));
 }
 
 function clean (done) {

@@ -7,7 +7,8 @@ My lightly development boilerplate
 1. Clone the reposotiry to a new folder
 2. Make a dir build in the root directory and define as build environment as you need
 3. Install project dependencies with npm/yarn install
-
+4. Write your code on the src folder
+5. Build your project
 
 ### Git clone
 
@@ -40,7 +41,19 @@ You must declare an object as the module.exports with two keys:
 1. **statics**: Where the bundle file has to be deployed
 2. **environment**: The name of the current environment
 
+There are three default environments: 
+
+1. **pro** for the production deploy environment.
+2. **pre** for the preproduction deploy environment.
+3. **dev** for the local deploy for development.
+
 ### Dependencies
 
+If your project has npm dependencies you may install it with the client of your preference (npm/yarn) on the project saving it in the packages.json index.
+
+### Src folder
+
+Your code must be placed inside the **src** folder. Inside the folder you must find three more folders and the **index.html**. The html file is the index where your bundle will be loaded. The **assets** is where static files and others must be placed and referenced from your code. The **styles** is the folder where all your styling code must be placed and referenced from your code. Ath the end, inside **scripts** folder is where your javascript code will be placed.
 
 ### Build
+
