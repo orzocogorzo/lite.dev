@@ -1,0 +1,78 @@
+/*
+# Color Variables
+
+To create the color name variables use the website [Name That Color](http://chir.ag/projects/name-that-color).
+Then, and only then, you can use that variable for your own color name variables ;)
+
+E.g.
+* You have the color `#424242`.
+* Go to [Name That Color](http://chir.ag/projects/name-that-color) and paste `#424242`.
+* You'll get a name. In this case **Tundora**.
+* Create a new variable `$tundora = #424242` *(variable names always start with `$` and are lowercase)*.
+* Now you can use `$tundora` for example in `$base-font-color` or in `$primary-btn-color`, etc.
+
+*/
+
+$cararra = #F3F2EF
+$desert-storm = #fafaf9
+$dove-gray = #707070
+$dune = #33302E
+$mine-shaft = #212121
+$shark = #1D1D1F
+$cod-gray = #0A0A0A
+$natural-gray = #8A8785
+$pampas = #F7F6F4
+$sandstone = #79706a
+$tango = #EA5D1A
+$rhino = #283C5C
+$big-stone = #152031
+$viking = #6ad0d9
+$westar = #DEDAD4
+$zorba = #9F948E
+$caribbean-green = #5FE0B7
+
+$base-font-color = #ffffff
+
+$primary-btn-color = $rhino
+$secondary-btn-color = #fff
+
+$primary-theme-color = $rhino
+$secondary-theme-color = $big-stone
+
+$link-color = $tango
+
+$theme-colors = {
+  "primary": $rhino,
+  "secondary": $big-stone,
+  "tertiary": $mine-shaft,
+  "highlight": $viking
+}
+
+$font-colors = {
+  "primary": $mine-shaft,
+  "secondary": $desert-storm,
+  "highlight": $tango
+}
+
+$btn-colors = {
+  "primary": $rhino,
+  "secondary": $desert-storm
+}
+
+f-theme-colors(color)
+  unless color in $colors
+    warn(color + " color isn't defined in $theme-colors")
+
+  return $colors[color]
+
+f-font-colors(color)
+  unless color in $colors
+    warn(color + " color isn't defined in $font-colors")
+
+  return $font-colors[color]
+
+f-btn-colors(color)
+  unless color in $colors
+    warn(color + "color isn't defined in $btn-colors")
+
+  return $btn-colors[color]

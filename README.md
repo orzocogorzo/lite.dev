@@ -5,6 +5,7 @@ My lightly development boilerplate
 ## Setup
 
 1. Clone the reposotiry to a new folder
+2. Define your working environments
 2. Make a dir build in the root directory and define as build environment as you need
 3. Install project dependencies with npm/yarn install
 4. Write your code on the src folder
@@ -14,6 +15,34 @@ My lightly development boilerplate
 
 Copy the URI ```git@github.com:orzocogorzo/devlite.git``` to the clipboard and then, with the command ```git clone {{URI}} {{path/to/the/directory}}``` clone the source code to your local.
 Once you have the source code on your computed you should remove the **.git** folder on your directory to clean the boilerplate git history and start a new one by your own.
+
+### Environments
+
+In the file **envs.js** is where you should define your working environments.
+
+Each environment is declared following the next convention:
+
+```javascrpt
+module.exports = {
+    dev: {
+        name: 'development',
+        host: 'localhost',
+        port: 8050,
+        apiURL: 'http://localhost:8050/assets/data/',
+        staticURL: 'http://localhost:8050/assets/'
+    }
+}
+```
+
+The **envs.js** is a javascript module that exports an object with as environments declareds as you need. The key of each environment is the the alias that will match with the build files info. Inside each environment eobject there are 5 keys you must fill:
+
+1. **name** is the complete name of the environment. 
+2. **host** the host where the app will be placed.
+3. **port** the port where the app will be exposed.
+4. **apiURL** the path where the app will have their REST API.
+5. **staticURL** the path where the app will find their statics
+
+To this 5 required keys you can add more information to be consulted on runtime.
 
 ### Build files
 

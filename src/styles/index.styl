@@ -1,5 +1,29 @@
-@import 'components/app.styl';
-@import 'reset/index.styl';
+// VENDOR
+@import "vendor/vendor";
 
-body > div
-    display: flex
+// VARIABLES
+@import "base/colors";
+@import "base/variables";
+@import "base/typography";
+
+
+// UTILS
+@import "utils/mixins";
+@import "utils/functions";
+@import "utils/helpers";
+
+
+// PATCHES
+@import "patches/buttons";
+
+// RESET
+@import 'base/reset';
+
+// COMPONENTS
+@import 'components/app.styl';
+@import "components/Header.styl";
+@import "components/Footer.styl";
+@import "components/Home.styl";
+@import "components/Loader.styl";
+
+
