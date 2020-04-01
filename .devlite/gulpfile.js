@@ -51,12 +51,26 @@ const rc = (function () {
 })();
 
 function getEnv () {
-  const envPath = process.env.NODE_ENV === "production" ?
-    "./build/build.pro.js" : process.env.NODE_ENV === "preproduction" ?
-    "./build/build.pre.js" : process.env.NODE_ENV === "local" ? 
-    "./build/build.local.js" : "./build/build.dev.js";
-  console.log(envPath, process.env.NODE_ENV);
-    return require(envPath);
+  let environments = new Map([
+    ["pro", "./build/build.pro.js"],
+    ["pre", "./build/build.pre.js"],
+    ["dev", "./build/build.dev.js"]
+  ]);
+
+  fs.readdir(path.join(__dirname, "../build"), function (err, files) {
+    if (err) {
+      console.log("Can't find build directory defined by the user.");
+    } else {
+      if (files.length == 0) console.log("Can't find build environments defined by the user.");
+      let env;
+      files.filter(file => file.match(/^build\./).map(file => {
+        env = file.match(/^build\.([^\.]*)\.js$/);
+        environments.set(env, path.join(__dirname, "../build", file);
+      });
+    }
+  });
+
+  return require(envs.get(process.env.NODE_ENV) || envs);
 }
 
 function clean (done) {
@@ -107,15 +121,16 @@ function js (done) {
     .pipe(vinylSource('bundle.js'))
     .pipe(vinylBuffer());
 
-  if (process.env.NODE_ENV === 'production') {
-    proc = proc.pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(babel({presets: ['@babel/preset-env']}))
-      .pipe(uglify())
-      .on('error', console.error)
-    .pipe(sourcemaps.write());
-  } else {
-    proc = proc.pipe(connect.reload());
-  }
+  // if (process.env.NODE_ENV === 'production') {
+  //   proc = proc.pipe(sourcemaps.init({loadMaps: true}))
+  //     .pipe(babel({presets: ['@babel/preset-env']}))
+  //     .pipe(uglify())
+  //     .on('error', console.error)
+  //   .pipe(sourcemaps.write());
+  // } else {
+  //   proc = proc.pipe(connect.reload());
+  // }
+  proc = proc.pipe(connect.reload());
 
   return proc.pipe(dest(rc.dist));
 }
@@ -126,7 +141,8 @@ function css (done) {
   return src(join(rc.src, rc.css))
     .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(stylus({
-        compress: true
+        compress: true,
+        'include css': true
       }))
     .pipe(sourcemaps.write())
     .pipe(rename('bundle.css'))
@@ -139,8 +155,8 @@ css.descriptions = "Bundle all styuls files, compile them and move the output to
 
 function imageCompress (done) {
   return src(join(rc.src, rc.images, "\*"))
-    .pipe(image())
-    .pipe(connect.reload())
+    // .pipe(image())
+    // .pipe(connect.reload())
     .pipe(dest(join(rc.dist, "assets/images")));
 }
 imageCompress.description = "Compress images and move them to the .dist/assets/images folder";
@@ -191,7 +207,7 @@ const serve = series(pipeline, function serve (done) {
 
   watch(join(rc.src, rc.html), series(html));
   watch(join(rc.src, "\*\*/\*.js"), series(js));
-  watch(join(rc.src, "\*\*/\*.styl"), series(css));
+  watch(join(rc.src, "\*\*/\*.(styl|css)"), series(css));
   watch(join(rc.src, rc.images, "\*"), series(imageCompress));
   watch(join(rc.src, rc.data, "\*"), series(data));
 });
