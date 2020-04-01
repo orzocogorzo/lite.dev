@@ -41,7 +41,7 @@ You must declare an object as the module.exports with two keys:
 1. **statics**: Where the bundle file has to be deployed
 2. **environment**: The name of the current environment
 
-There are three default environments: 
+There are three default environments (that can be overwriteds): 
 
 1. **pro** for the production deploy environment.
 2. **pre** for the preproduction deploy environment.
@@ -56,4 +56,10 @@ If your project has npm dependencies you may install it with the client of your 
 Your code must be placed inside the **src** folder. Inside the folder you must find three more folders and the **index.html**. The html file is the index where your bundle will be loaded. The **assets** is where static files and others must be placed and referenced from your code. The **styles** is the folder where all your styling code must be placed and referenced from your code. Ath the end, inside **scripts** folder is where your javascript code will be placed.
 
 ### Build
+
+Inside the package.json comes defined three scripts by default as three ways to build your project:
+
+1. **serve** for setup the project in development mode.
+2. **build:pre** to build the project with the pre as the active environment
+3. **build:pro** to build the project with the pro as the active environment
 
