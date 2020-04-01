@@ -1,19 +1,20 @@
-# DEVLITE
+# DevLite
 
 My lightly development boilerplate
 
-## SETUP
+## Setup
 
 1. Clone the reposotiry to a new folder
 2. Make a dir build in the root directory and define as build environment as you need
 3. Install project dependencies with npm/yarn install
 
 
-### GIT CLONE
+### Git clone
 
+Copy the URI ```git@github.com:orzocogorzo/devlite.git``` to the clipboard and then, with the command ```git clone {{URI}} {{path/to/the/directory}}``` clone the source code to your local.
+Once you have the source code on your computed you should remove the **.git** folder on your directory to clean the boilerplate git history and start a new one by your own.
 
-
-### BUILD FILES
+### Build files
 
 Declare one build file for each environment to deploy the project you have, from the develop on the localhost to the remote production environment.
 
@@ -39,7 +40,7 @@ You must declare an object as the module.exports with two keys:
 1. **statics**: Where the bundle file has to be deployed
 2. **environment**: The name of the current environment
 
-### DEPENDENCIES
+### Dependencies
 
 
-### BUILD
+### Build
