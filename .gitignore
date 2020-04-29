@@ -1,7 +1,7 @@
 # npm environment
 node_modules
-yarn-error.log
-yarn.lock
+# yarn-error.log
+# yarn.lock
 
 # folders
 .dist/*
