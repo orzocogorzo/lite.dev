@@ -1,4 +1,5 @@
 const BaseView = require('../base/BaseView.js');
+const { lazyLoad } = require("../helpers/index.js");
 
 module.exports = (function () {
     const Home = BaseView.extend(function Home (el, state, parent) {
@@ -11,21 +12,41 @@ module.exports = (function () {
                     // node
                     "div#home", {
                         class: {
-                            flex: true
+                            flex: true,
+                            col: true
                         }
                     },
-                    [
-                        // NODES
-                        [
-                            // NODE
-                            "h1",
-                            "DevLite.js boilerplate"
+                    // NODES
+                    ["section1", "section2", "section3"].map(section => {
+                        return [
+                            "div#"+section, {
+                                class: {
+                                    "home__section": true
+                                }
+                            }, [
+                                [
+                                    "img#"+section, {
+                                        attrs: {
+                                            "src": `${environment.staticURL}images/${section}-lazy.jpg`,
+                                            "data-lazysrc": `${environment.staticURL}images/${section}.jpg`
+                                        }
+                                    }
+                                ],
+                                [
+                                    "h1",
+                                    section
+                                ]
+                            ]
                         ]
-                    ]
+                    })
                 ]
             ];
         }
     });
+
+    Home.prototype.onRender = function onRender () {
+        lazyLoad(Array.apply(null, document.getElementsByClassName("home__section")).map(section => section.children[0]));
+    }
 
     return Home;
 
