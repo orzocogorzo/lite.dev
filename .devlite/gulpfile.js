@@ -49,9 +49,10 @@ const rc = (function () {
 function getHtmlGlobals () {
   let htmlGlobals;
   try {
-    htmlGlobals = require(process.env.NODE_ENV === "production" ?
-      "../build/build.pro.js" : process.env.NODE_ENV === "preproduction" ?
-      "../build/build.pre.js" : "../build/build.dev.js");
+    htmlGlobals = require(process.env.NODE_ENV === "PRO" ?
+      "../build/build.pro.js" : process.env.NODE_ENV === "PRE" ?
+      "../build/build.pre.js" : process.env.NODE_ENV === "DEV" ?
+      "../build/build.dev.js" : "../build/build.custom.js");
   } catch (err) {
     console.log(err);
     throw new Error("No build folder found. Please define your build environment config files into a build folder on your root directory.");
@@ -107,7 +108,7 @@ function js (done) {
     .pipe(vinylSource('bundle.js'))
     .pipe(vinylBuffer());
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'PRO') {
     proc = proc.pipe(sourcemaps.init({loadMaps: true}))
       .pipe(babel({presets: ['@babel/preset-env']}))
       .pipe(uglify())
@@ -126,7 +127,8 @@ function css (done) {
   return src(join(rc.src, rc.css))
     .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(stylus({
-        compress: true
+        compress: true,
+        'include css': true
       }))
     .pipe(sourcemaps.write())
     .pipe(rename('bundle.css'))
@@ -191,7 +193,7 @@ const serve = series(pipeline, function serve (done) {
 
   watch(join(rc.src, rc.html), series(html));
   watch(join(rc.src, "\*\*/\*.js"), series(js));
-  watch(join(rc.src, "\*\*/\*.styl"), series(css));
+  watch(join(rc.src, "\*\*/\*.styl|css"), series(css));
   watch(join(rc.src, rc.images, "\*"), series(imageCompress));
   watch(join(rc.src, rc.data, "\*"), series(data));
 });
@@ -199,7 +201,6 @@ serve.description = "Setup a static server, start a livereload listener and put 
 exports.serve = serve;
 
 const build = series(pipeline, deploy, function (done) {
-    process.env.NODE_ENV = "production";
     return done();
 });
 build.description = "execute build rutine and deploy the result on the server";
