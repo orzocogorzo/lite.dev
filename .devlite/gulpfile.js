@@ -1,5 +1,6 @@
 // SYS
 const path = require("path");
+const fs = require("fs");
 
 // VENDOR
 const { src, dest, parallel, series, watch } = require('gulp');
@@ -23,25 +24,20 @@ const rename = require('gulp-rename');
 const join = path.join;
 const rc = (function () {
   const template = {
-    build: "../server/statics",
-    dist: ".dist",
+    build: "server/statics",
+    dist: "dist",
     src: "src",
     js: "scripts/index.js",
     html: "index.html",
     css: "styles/index.styl",
-    images: "assets/images",
-    data: "assets/data"
+    images: "statics/images",
+    data: "statics/data"
   }
   try {
-    const rc = require("../devliterc.js");
-    const user = Object.keys(rc).reduce((a, k) => {
-      a[k] = k === "dist" || k === "src" || k === "build" ? join("..", rc[k]) : rc[k];
-      return a;
-    }, new Object());
-    Object.keys(rc).map((k) => {
+    const user = require("../devliterc.js");
+    Object.keys(template).map((k) => {
       user[k] = user[k] || template[k];
     });
-    console.log(user);
     return user;
   } catch (e) {
     console.error(e);
@@ -50,11 +46,24 @@ const rc = (function () {
   }
 })();
 
-function getEnv () {
-  const envPath = process.env.NODE_ENV === "production" ?
-    "./build/build.pro.js" : process.env.NODE_ENV === "preproduction" ?
-    "./build/build.pre.js" : "./build/build.dev.js";
-  return require(envPath);
+function getHtmlGlobals () {
+  let htmlGlobals;
+  try {
+    htmlGlobals = require(process.env.NODE_ENV === "production" ?
+      "../build/build.pro.js" : process.env.NODE_ENV === "preproduction" ?
+      "../build/build.pre.js" : "../build/build.dev.js");
+  } catch (err) {
+    console.log(err);
+    throw new Error("No build folder found. Please define your build environment config files into a build folder on your root directory.");
+  }
+  
+  try {
+    htmlGlobals.env = require("../envs.js")[htmlGlobals.env];
+    return htmlGlobals;
+  } catch (err) {
+    console.log(err);
+    throw new Error("Not envs.js found. Please define your client environment variables in a file and name it envs.js on your root directory.");
+  }
 }
 
 function clean (done) {
@@ -69,7 +78,7 @@ clean.description = "Remove dist folder contents";
 
 
 function dist (done) {
-  const assets = join(rc.dist, "assets");
+  const assets = join(rc.dist, "statics");
   return src("*.*", {read: false})
     .pipe(dest(join(assets)))
     .pipe(dest(join(assets, "images")))
@@ -110,7 +119,7 @@ function js (done) {
 
   return proc.pipe(dest(rc.dist));
 }
-js.description = 'Bundle js files, compile them with buble and uglify and move the output to the .dist folder';
+js.description = 'Bundle js files, compile them with buble and uglify and move the output to the dist folder';
 // exports.js = js;
 
 function css (done) {
@@ -124,7 +133,7 @@ function css (done) {
     .pipe(connect.reload())
     .pipe(dest(rc.dist));
 }
-css.descriptions = "Bundle all styuls files, compile them and move the output to the .dist folder";
+css.descriptions = "Bundle all styuls files, compile them and move the output to the dist folder";
 // exports.css = css;
 
 
@@ -132,29 +141,29 @@ function imageCompress (done) {
   return src(join(rc.src, rc.images, "\*"))
     .pipe(image())
     .pipe(connect.reload())
-    .pipe(dest(join(rc.dist, "assets/images")));
+    .pipe(dest(join(rc.dist, "statics/images")));
 }
-imageCompress.description = "Compress images and move them to the .dist/assets/images folder";
+imageCompress.description = "Compress images and move them to the dist/statics/images folder";
 // exports.image = imageCompress;
 
 function data (done) {
   return src(join(rc.src, rc.data, "\*"))
     .pipe(connect.reload())
-    .pipe(dest("../.dist/assets/data"));
+    .pipe(dest(join(rc.dist, "statics/data")));
 };
-data.description = "Move data to .dist folder";
+data.description = "Move data to dist folder";
 // exports.data = data;
 
 
 function html (done) {
-  const env = getEnv();
+  const env = getHtmlGlobals();
   return src(join(rc.src, rc.html))
     .pipe(replace({global: env}))
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(connect.reload())
     .pipe(dest(rc.dist));
 }
-html.description = "Minify index.html and put it on the .dist folder";
+html.description = "Minify index.html and put it on the dist folder";
 // exports.html = html;
 
 const bundle = parallel(html, js, css, imageCompress, data);
@@ -189,10 +198,10 @@ const serve = series(pipeline, function serve (done) {
 serve.description = "Setup a static server, start a livereload listener and put gulp watching for changes";
 exports.serve = serve;
 
-const build = series(function (done) {
+const build = series(pipeline, deploy, function (done) {
     process.env.NODE_ENV = "production";
     return done();
-}, pipeline, deploy);
+});
 build.description = "execute build rutine and deploy the result on the server";
 exports.build = build;
 

@@ -1,4 +1,5 @@
 module.exports = {
     statics: '/statics/',
-    environment: 'pro'
+    env: 'pro',
+    base_url: null
 }

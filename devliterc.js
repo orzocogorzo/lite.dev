@@ -1,12 +1,12 @@
-// DEVLITE CONFIGUTATINO FILE
+// DEVLITE CONFIGURATION FILE
 
 module.exports = {
-    build: "../server/statics/admin",
-    dist: ".dist",
+    build: "../server/client",
+    dist: "dist",
     src: "src",
     js: "scripts/index.js",
     html: "index.html",
     css: "styles/index.styl",
-    images: "assets/images",
-    data: "assets/data"
+    images: "statics/images",
+    data: "statics/data"
 }
