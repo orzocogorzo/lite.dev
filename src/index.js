@@ -1,7 +1,7 @@
 // VENDOR
 
 // MODULES
-const startApp = require('./app.js');
+const startApp = require('./scripts/app.js');
 
 
 if (document.addEventListener) {

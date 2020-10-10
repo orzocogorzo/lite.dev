@@ -3,7 +3,7 @@ node_modules
 yarn-error.log
 
 # folders
-.dist/*
-src/assets/data/*
-src/assets/images/*
-src/assets/fonts/*
+dist/*
+statics/data/*
+statics/images/*
+statics/fonts/*

@@ -1,12 +1,9 @@
-// DEVLITE CONFIGURATION FILE
+// DEVLITE CONFIGURATION FILE WITH INFORMATION
+// ABOUT THE FOLDER STRUCTURE
 
 module.exports = {
-    build: "../server/client",
     dist: "dist",
     src: "src",
-    js: "scripts/index.js",
-    html: "index.html",
-    css: "styles/index.styl",
-    images: "statics/images",
-    data: "statics/data"
+    statics: "statics",
+    port: 8050
 }
