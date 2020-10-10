@@ -12,8 +12,5 @@
     "serve": "export NODE_ENV='dev' && gulp --gulpfile .devlite/gulpfile.js --cwd $PWD serve",
     "build:pre": "export NODE_ENV='pre' && gulp --gulpfile .devlite/gulpfile.js --cwd $PWD deploy",
     "build:pro": "export NODE_ENV='pro' && gulp --gulpfile .devlite/gulpfile.js --cwd $PWD deploy"
-  },
-  "devDependencies": {
-    "envify": "^4.1.0"
   }
 }
